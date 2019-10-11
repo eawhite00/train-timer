@@ -1,0 +1,12 @@
+body{
+    font-family: 'PT Mono', monospace;
+}
+
+.jumbotron{
+    font-family: 'Playfair Display SC', serif;
+    padding: 1rem;
+}
+
+.card-header{
+    font-weight: bolder;
+}
