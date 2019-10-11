@@ -1,5 +1,4 @@
-
-// Firebase config
+// Set up firebase config
 var firebaseConfig = {
     apiKey: "AIzaSyBxfjuizISPOgQGFn1mvugHNiROE6XH7Cc",
     authDomain: "train-timer-a8487.firebaseapp.com",
@@ -52,36 +51,36 @@ $("#addTrainButton").on("click", function(event) {
 database.ref().on("child_added", function(childSnapshot) {
     console.log(childSnapshot.val());
   
-    // Store everything into a variable.
+    // Store everything into appropriate variables
     var trainName = childSnapshot.val().name;
     var trainDestination = childSnapshot.val().destination;
     var trainFirstTime = moment(childSnapshot.val().time, "X");
     var trainFrequency = childSnapshot.val().frequency;
-    var nextTrainTime = moment();
-  
-    // Employee Info
-    console.log(trainName);
-    console.log(trainDestination);
-    console.log(trainFirstTime);
-    console.log(trainFrequency);
-  
+    var nextTrainTime = moment(); // default to the current time
+    var minutesAway = '0' // initiaulized at zero
 
-    // Calculate next train time
-    var minutesAway = '0'
+    // Below we calculate when the next train is coming
 
-    //var empMonths = moment().diff(moment(empStart, "X"), "months");   
+    // First we get the number of minutes between now and when the first train of the day is scheduled
     var trainTimeDifference = moment().diff(trainFirstTime, "minutes");
-    console.log(trainTimeDifference); 
-
+    
+    // If trainTimeDifference is positive it means the first train has already come, and we need to calcuate the next one with the train frequency.
     if (trainTimeDifference > 0){
-        minutesAway = trainFrequency - (trainTimeDifference % trainFrequency);
-        nextTrainTime.add(minutesAway, "minutes");
-    } else{
-        nextTrainTime = trainFirstTime;
-        minutesAway = (trainTimeDifference * -1) + 1;
-    }
 
-    // Calculate minutes to next train
+        // Here we get the number of minutes to the next train
+        minutesAway = trainFrequency - (trainTimeDifference % trainFrequency);
+
+        // Add that number of minutes to the current time
+        nextTrainTime.add(minutesAway, "minutes");
+
+    } else{
+
+        //If we're in here, it means the train hasn't come for the first time yet. We just set the next train to be its first time.
+        nextTrainTime = trainFirstTime;
+
+        //We've already calcucated the minutes to the next train, but we need to flip it to positive because of how the diff is oreitned.
+        minutesAway = (trainTimeDifference * -1) + 1; // one extra because the difference cuts off a minute because it doesn't round seconds
+    }
   
     // Create the new row
     var newRow = $("<tr>").append(
